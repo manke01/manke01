@@ -1,99 +1,157 @@
-local function getInventoryFromScrollingFrame(scrollingFrame)
-    local items = {}
-    for _, child in ipairs(scrollingFrame:GetChildren()) do
-        if child:FindFirstChild("TierImage") then
-            local tierImageURL = tostring(child.TierImage.Image)
-            local rarity = ""
-            if tierImageURL == "rbxassetid://9473887537" then
-                rarity = "E"
-            elseif tierImageURL == "rbxassetid://9481936456" then
-                rarity = "L"
-            end
-            if rarity ~= "" then
-                table.insert(items, child.TierImage.Parent.Name .. "(" .. rarity .. ")")
-            end
-        end
-    end
-    return items
-end
-local function decodeJSON(jsonString)
-    local success, result = pcall(game:GetService("HttpService").JSONDecode, game:GetService("HttpService"), jsonString)
-    if success then
-        return result
-    else
-        warn("Error decoding JSON:", result)
-        return nil
-    end
-end
-local function checkFightingStyle(boughtDataString)
-    local boughtData = decodeJSON(boughtDataString)
-    if not boughtData then
-        return nil
-    end
-
-    local trueCount = 0
-    for _, value in pairs(boughtData) do
-        if value == true then
-            trueCount = trueCount + 1
-        end
-    end
-    
-    local style = ""
-    if trueCount >= 3 and trueCount < 5 then
-        style = "3-5"
-    elseif trueCount < 3 then
-        style = "0-2"
-    elseif trueCount >= 5 then
-        style = "God"
-    end
-    
-    return style
-end
-
-local function extractRaceData(raceDataString)
-    local raceData = decodeJSON(raceDataString)
-    if not raceData then
-        return nil
-    end
-
-    local appearance = raceData.Appearance or ""
-    local race = raceData.Race or ""
-    
-    local raceString = string.gsub(race .. "V" .. appearance, "%s", "")
-    return raceString
-end
-
-while true do
-    local player = game.Players.LocalPlayer
-    local weaponInventory = getInventoryFromScrollingFrame(player.PlayerGui.MainGui.StarterFrame.Inventory_Frame.ScrollingFrame)
-    local accessoryInventory = getInventoryFromScrollingFrame(player.PlayerGui.MainGui.StarterFrame.Inventory_Frame.ScrollingFrameAccessories)
-    local fruitInventory = getInventoryFromScrollingFrame(player.PlayerGui.MainGui.StarterFrame.Inventory_Frame.ScrollingFrameFruits)
-    local fightingStyle = checkFightingStyle(player.PlayerStats.Bought.Value)
-    local raceData = extractRaceData(player.PlayerStats.RaceTbl.Value)
-
-    local data = {
-        ['Basic Data'] = {
-            Level = player.PlayerStats.lvl.Value,
-            Beli = player.PlayerStats.beli.Value,
-            Fragments = player.PlayerStats.Gem.Value,
-            DevilFruit = accessoryInventory,
-            Race = raceData or "Unknown",
-            ['Bounty/Honor'] = 0,
-            ['Fighting Style'] = fightingStyle or "Unknown"
-        },
-        ['Items Inventory'] = weaponInventory,
-        ['Fruits Inventory'] = fruitInventory
+script_key = "bgEJkuSyiStZWHvIfSxkIhWZbKRxwqSV"
+getgenv().Team = "Pirates"
+getgenv().WebhookSetting = {
+    Enable = true,
+    Url = "",
+    Embed = true,
+    StoredFruit = true,
+    ImageEmbed = true,
+    CustomImage = false,
+    CustomImageUrl = "", --Your Url
+    OnServerHop = true,
+    BountyChanged = true,
+}
+getgenv().PlayerSetting = {
+    SafeMode = true,
+    SafeModeHealth = {4000,70},--Number And %, Start Safe Mode And Stop Safe Mode
+    UseRaceV3 = true,
+    SmartUseRaceV3= true,
+    DashIfV4 = true,
+    Dash=true,
+    IgnoreInCombat = true, --Turn This Off When Reseting Or Hop You Lost Bounty (Rare, Happens On Some Accounts)
+    ChatKillEnable = false,
+    Chat = {"Ez","You're just too bad"},
+    IgnoreFriends = true, --Serverhop if you friend in your server
+}
+getgenv().AttackSetting = {
+    ForceMelee = true,
+    ForceMeleeTime = 3.5,
+    StopAttack =true, --When Meet Below Condition
+    StopAttackAtHealth = 80,--%
+    FastAttack=true, -- Toggle Fast Attack
+}
+getgenv().UseSkillSetting = {
+    -- Three Methods: "Normal", "Fast", "Spam", "SpamAll"
+    MethodIfTargetOnV4 = "Fast",
+    MethodIfPlayerOnV4 = "Normal",
+    MethodIfTargetUseFruit = {Fruits={},Method="Fast"},
+    NormalMethod = "Normal",
+    LowHealthPlayerCondition = { --Player Can Attack Us, No Need For Slow Attack
+        Enable = true,
+        Health = 70,--%Health That Are Low
+        Method = "Fast",
+    },
+    LowHealthTargetCondition = {
+        Enable = true,
+        Health = 30,--%Health That Are Low
+        DelayFirstTime = {true,2}, --1 Is Enable, 2 Is Second To Delay Before Attack Again
+        Method = "Normal",
+        WaitTime = 1.5,-- If Normal Method, Wait Every Skill If It Hits Target
     }
+}
+getgenv().WeaponsSetting = {
+    ["Melee"] = {
+        ["Enable"] = true,
+        ["Delay"] = 3, 
+        ["SwitchNextWeaponIfCooldown"] = true,
+        ["Skills"] = {
+            ["Z"] = {
+                ["Enable"] = true,
+                ["NoPredict"] = true, -- For Dragon Tailon, Disable it 
+                ["HoldTime"] = 0,
+                ["TimeToNextSkill"] = 0,
+            },
+        [ "X"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0,
+                ["TimeToNextSkill"] = 0,
+            },
 
-    local successWrite, errorMessage = pcall(function()
-        writefile(string.format("%sData.json", player.Name), game:GetService("HttpService"):JSONEncode(data))
-    end)
+            ["C"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0,
+                ["TimeToNextSkill"] = 0,
+            },
+        },
+    },
+    ["Blox Fruit"] = {
+        ["Enable"] = true,
+        ["Delay"] = 4,
+        ["SwitchNextWeaponIfCooldown"] = true,
+        ["Skills"] = {
+            ["Z"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 2,
+                ["TimeToNextSkill"] = 0,
+            },
+            ["X"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0,
+                ["TimeToNextSkill"] = 0,
+            },
 
-    if successWrite then
-        print(string.format("The file with name %sData.json has been written", player.Name))
-    else
-        warn("Got error:", errorMessage)
-    end
-
-    wait(35)
-end
+            ["C"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0,
+                ["TimeToNextSkill"] = 0,
+            },
+            ["V"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0,
+                ["TimeToNextSkill"] = 0,
+            },
+            ["F"] = {
+                ["Enable"] = false,
+                ["HoldTime"] = 0,
+                ["TimeToNextSkill"] = 0,
+            },
+        },
+    },
+    ["Sword"] = {
+        ["Enable"] = true,
+        ["Delay"] = 0.5,
+        ["Skills"] = {
+            ["Z"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0.1,
+                ["TimeToNextSkill"] = 0,
+            },
+            ["X"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0.2,
+                ["TimeToNextSkill"] = 0,
+            },
+        },
+    },
+    ["Gun"] = {
+        ["Enable"] = true,
+        ["Delay"] = 0.5,
+        ["Skills"] = {
+            ["Z"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0.1,
+                ["TimeToNextSkill"] = 0,
+            },
+            ["X"] = {
+                ["Enable"] = true,
+                ["HoldTime"] = 0.1,
+                ["TimeToNextSkill"] = 0,
+            },
+        },
+    },
+}
+getgenv().Theme = { -- getgenv().Theme = false if you want to disable
+    OldTheme = true,
+    Name="Hutao", --"Raiden","Ayaka","Hutao","Yelan","Miko","Nahida","Ganyu","Keqing","Nilou","Barbara","Zhongli","Layla"
+    Custom={
+            ["Enable"] = false,
+            ['char_size'] = UDim2.new(0.668, 0, 1.158, 0),
+            ['char_pos'] = UDim2.new(0.463, 0, -0.105, 0),
+            ['title_color'] = Color3.fromRGB(255, 221, 252),
+            ['titleback_color'] = Color3.fromRGB(169, 20, 255),
+            ['list_color'] = Color3.fromRGB(255, 221, 252),
+            ['liststroke_color'] = Color3.fromRGB(151, 123, 207),
+            ['button_color'] = Color3.fromRGB(255, 221, 252)
+       }
+}
+loadstring(game:HttpGet("https://api.luarmor.net/files/v3/loaders/248f97d7a28a4d09c641d8279a935333.lua"))()
