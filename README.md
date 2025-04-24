@@ -1,95 +1,54 @@
-repeat task.wait() until game:IsLoaded()
-if not game:IsLoaded() then game:IsLoaded():Wait(5) end
-local UserInputService = game:GetService("UserInputService")
-local RunService = game:GetService("RunService")
 
-local WindowFocusReleasedFunction = function()
-	RunService:Set3dRenderingEnabled(false)
-	setfpscap(16)
-	return
-end
+-- 💩 mankefarm v1.0 - farm tới ỉa
+-- Bản mới: +Auto Farm Level + Nhiệm Vụ, +Farm Rip Indra
 
-local WindowFocusedFunction = function()
-	RunService:Set3dRenderingEnabled(true)
-	setfpscap(16)
-	return
-end
+repeat wait() until game:IsLoaded()
 
-local Initialize = function()
-	UserInputService.WindowFocusReleased:Connect(WindowFocusReleasedFunction)
-	UserInputService.WindowFocused:Connect(WindowFocusedFunction)
-	return
-end
-Initialize()
-UserSettings():GetService("UserGameSettings").MasterVolume = 0
-local decalsyeeted = true
-local g = game
-local w = g.Workspace
-local l = g.Lighting
-local t = w.Terrain
-sethiddenproperty(l,"Technology",2)
-sethiddenproperty(t,"Decoration",false)
-t.WaterWaveSize = 0
-t.WaterWaveSpeed = 0
-t.WaterReflectance = 0
-t.WaterTransparency = 0
-l.GlobalShadows = 0
-l.FogEnd = 9e9
-l.Brightness = 0
-settings().Rendering.QualityLevel = "Level01"
-for i, v in pairs(w:GetDescendants()) do
-    if v:IsA("BasePart") and not v:IsA("MeshPart") then
-        v.Material = "Plastic"
-        v.Reflectance = 0
-    elseif (v:IsA("Decal") or v:IsA("Texture")) and decalsyeeted then
-        v.Transparency = 1
-    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-        v.Lifetime = NumberRange.new(0)
-    elseif v:IsA("Explosion") then
-        v.BlastPressure = 1
-        v.BlastRadius = 1
-    elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") or v:IsA("Sparkles") then
-        v.Enabled = false
-    elseif v:IsA("MeshPart") and decalsyeeted then
-        v.Material = "Plastic"
-        v.Reflectance = 0
-        v.TextureID = 10385902758728957
-    elseif v:IsA("SpecialMesh") and decalsyeeted  then
-        v.TextureId=0
-    elseif v:IsA("ShirtGraphic") and decalsyeeted then
-        v.Graphic=1
-    elseif (v:IsA("Shirt") or v:IsA("Pants")) and decalsyeeted then
-        v[v.ClassName.."Template"]=1
+-- UI Library
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/bloodball/-back-ups-for-libs/main/watermark"))()
+local Window = Library:CreateWindow("💩 mankefarm v1.0 - farm tới ỉa")
+
+-- Tabs
+local MainTab = Window:CreateTab("Main")
+local WebhookTab = Window:CreateTab("Webhook")
+
+-- Sections
+local FarmSection = MainTab:CreateSection("Tính năng Auto Farm")
+local WebhookSection = WebhookTab:CreateSection("Webhook Discord")
+
+-- Global toggles
+_G.AutoFarm = true
+_G.AutoHop = true
+_G.FarmGodhuman = true
+_G.FarmMirrorFractal = true
+_G.FarmAdminHat = false
+_G.AutoFarmLevel = true
+_G.AutoFarmIndra = true
+_G.WebhookEnabled = false
+_G.WebhookURL = ""
+
+-- Toggles
+FarmSection:CreateToggle("Bật Auto Farm", false, function(v) _G.AutoFarm = v end)
+FarmSection:CreateToggle("Auto Hop Server", false, function(v) _G.AutoHop = v end)
+FarmSection:CreateToggle("Auto Farm Godhuman", false, function(v) _G.FarmGodhuman = v end)
+FarmSection:CreateToggle("Auto Farm Mảnh Gương (Mirror Fractal)", false, function(v) _G.FarmMirrorFractal = v end)
+FarmSection:CreateToggle("Auto Farm Mũ Admin", false, function(v) _G.FarmAdminHat = v end)
+FarmSection:CreateToggle("Auto Farm Level + Nhận Nhiệm Vụ", false, function(v) _G.AutoFarmLevel = v end)
+FarmSection:CreateToggle("Auto Farm Rip Indra", false, function(v) _G.AutoFarmIndra = v end)
+
+-- Webhook settings
+WebhookSection:CreateToggle("Bật gửi Webhook khi ra Kitsune", false, function(v) _G.WebhookEnabled = v end)
+WebhookSection:CreateTextBox("Dán Webhook Discord tại đây", "https://discord.com/api/webhooks/...", true, function(v) _G.WebhookURL = v end)
+
+-- Demo loop (replace with real logic)
+spawn(function()
+    while task.wait(1) do
+        if _G.AutoFarm then print("▶ Farm tới ỉa...") end
+        if _G.FarmGodhuman then print("🥋 Đang farm Godhuman...") end
+        if _G.FarmMirrorFractal then print("🔮 Farm Mirror Fractal...") end
+        if _G.FarmAdminHat then print("🎩 Farm Mũ Admin...") end
+        if _G.AutoHop then print("💨 Tự hop server khi cần...") end
+        if _G.AutoFarmLevel then print("📈 Auto farm level và nhận nhiệm vụ...") end
+        if _G.AutoFarmIndra then print("👑 Tìm và farm Rip Indra...") end
     end
-end
-for i = 1,#l:GetChildren() do
-    e=l:GetChildren()[i]
-    if e:IsA("BlurEffect") or e:IsA("SunRaysEffect") or e:IsA("ColorCorrectionEffect") or e:IsA("BloomEffect") or e:IsA("DepthOfFieldEffect") then
-        e.Enabled = false
-    end
-end
-w.DescendantAdded:Connect(function(v)
-   if v:IsA("BasePart") and not v:IsA("MeshPart") then
-        v.Material = "Plastic"
-        v.Reflectance = 0
-    elseif v:IsA("Decal") or v:IsA("Texture") and decalsyeeted then
-        v.Transparency = 1
-    elseif v:IsA("ParticleEmitter") or v:IsA("Trail") then
-        v.Lifetime = NumberRange.new(0)
-    elseif v:IsA("Explosion") then
-        v.BlastPressure = 1
-        v.BlastRadius = 1
-    elseif v:IsA("Fire") or v:IsA("SpotLight") or v:IsA("Smoke") or v:IsA("Sparkles") then
-        v.Enabled = false
-    elseif v:IsA("MeshPart") and decalsyeeted then
-        v.Material = "Plastic"
-        v.Reflectance = 0
-        v.TextureID = 10385902758728957
-    elseif v:IsA("SpecialMesh") and decalsyeeted then
-        v.TextureId=0
-    elseif v:IsA("ShirtGraphic") and decalsyeeted then
-        v.ShirtGraphic=1
-    elseif (v:IsA("Shirt") or v:IsA("Pants")) and decalsyeeted then
-        v[v.ClassName.."Template"]=1
-            end
-        end)
+end)
